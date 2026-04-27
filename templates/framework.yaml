@@ -1,0 +1,250 @@
+# GTM Framework — Template (Alacient pre-filled)
+# ─────────────────────────────────────────────────────────────────────────────
+# Copy to: ~/.gtm-os/tenants/{slug}/framework.yaml
+# This is the master context file injected into every agent interaction.
+# ─────────────────────────────────────────────────────────────────────────────
+
+version: 1
+
+company:
+  name: "Alacient"
+  website: "https://alacient.com"
+  linkedinUrl: "https://linkedin.com/company/alacient"
+  industry: "Management Consulting"
+  subIndustry: "Agile & Digital Transformation"
+  stage: "growth"
+  description: >
+    Alacient is an agile transformation consultancy that helps mid-size
+    technology companies adopt and scale agile methodologies. We embed
+    experienced agile coaches and practitioners inside engineering and product
+    organisations to accelerate delivery velocity, improve team alignment,
+    and build lasting agile capability.
+  teamSize: "11-50"
+  headquarters: "United Kingdom"
+
+positioning:
+  valueProp: >
+    We help scaling tech companies ship faster and more predictably by
+    embedding agile expertise directly into their teams — not just training,
+    but doing it with them until it sticks.
+  tagline: "Agile that actually works."
+  category: "Agile Transformation Consulting"
+
+  differentiators:
+    - "Embedded delivery model — coaches work inside your team, not from a slide deck"
+    - "Outcome-based engagement — we measure velocity improvement, not hours billed"
+    - "Practical, not theoretical — we adapt methodology to your context"
+    - "Rapid time-to-value — most clients see measurable improvement within 30 days"
+
+  proofPoints:
+    - "Average 40% improvement in sprint predictability within 60 days"
+    - "Worked with 50+ engineering teams across SaaS, FinTech, and HealthTech"
+    - "Net Promoter Score of 72 from client engagements"
+
+  competitors:
+    - name: "Scaled Agile (SAFe)"
+      positioning: "Framework-first, certification-heavy"
+      weaknesses:
+        - "Rigid framework that doesn't fit all company contexts"
+        - "Training-heavy, not hands-on delivery"
+        - "Expensive certification path"
+      battlecardNotes: "When SAFe comes up: we're not a framework — we're practitioners. We can work with SAFe or without it."
+
+    - name: "Internal Agile Coaches"
+      positioning: "In-house expertise"
+      weaknesses:
+        - "Hard to hire and retain"
+        - "Single perspective, no cross-industry experience"
+        - "Takes 6-12 months to ramp"
+      battlecardNotes: "We augment or accelerate what in-house coaches are doing. Not a replacement."
+
+    - name: "Big 4 Consulting"
+      positioning: "Transformation programmes"
+      weaknesses:
+        - "Expensive and slow"
+        - "Junior staff doing the work after partners sell"
+        - "Framework delivery, not embedded"
+      battlecardNotes: "We're faster, more hands-on, and a fraction of the cost."
+
+icpSegments:
+  - id: "engineering-leader-scaling"
+    name: "Engineering Leader at Scaling Company"
+    priority: primary
+    description: >
+      CTOs and VPs of Engineering at Series A–C SaaS/tech companies (100–1000 employees)
+      where engineering is growing faster than process can support it.
+
+    targeting:
+      roles:
+        - "CTO"
+        - "VP Engineering"
+        - "Head of Engineering"
+        - "Director of Engineering"
+      companySizes: ["100-250", "251-500", "501-1000"]
+      industries:
+        - "Software / SaaS"
+        - "FinTech"
+        - "HealthTech"
+        - "Enterprise Software"
+      fundingStages: ["Series A", "Series B", "Series C", "Growth"]
+
+    painPoints:
+      - "Engineering team has grown from 10 to 100+ and processes haven't kept up"
+      - "Sprint planning is chaotic, commitments are missed, stakeholders are frustrated"
+      - "Multiple squads with no cross-team coordination — dependencies block everything"
+      - "Senior engineers spending time on process instead of product"
+      - "Delivery timeline unpredictability making sales and customer commitments hard"
+
+    buyingTriggers:
+      - "Just raised a round and need to scale the team fast"
+      - "New CTO or engineering leader brought in to 'fix delivery'"
+      - "Board or investors pushing on engineering efficiency"
+      - "Recently posted for Scrum Masters or Engineering Managers"
+      - "LinkedIn post about delivery frustration or agile challenges"
+
+    disqualifiers:
+      - "Company has a mature, functioning agile practice (10+ Scrum Masters on staff)"
+      - "Fewer than 50 employees — too early for formal methodology"
+      - "Already engaged with another agile consultancy"
+      - "Engineering team lead is dogmatic about their current process"
+
+    voice:
+      tone: "Peer-to-peer. CTO to CTO. Direct and no-nonsense."
+      style: "Lead with their specific pain, not our service. Short sentences."
+      keyPhrases:
+        - "ship faster"
+        - "predictable delivery"
+        - "team alignment"
+        - "velocity"
+        - "without the chaos"
+      avoidPhrases:
+        - "synergy"
+        - "solutions"
+        - "leverage"
+        - "best-in-class"
+        - "agile journey"
+        - "transformation journey"
+      writingRules:
+        - "Max 3 sentences in a LinkedIn DM before the ask"
+        - "Always reference something specific from their profile or company"
+        - "CTA should be a question, not 'book a call'"
+        - "Never open with 'I hope this message finds you well'"
+
+    messaging:
+      elevatorPitch: >
+        We embed agile practitioners directly inside engineering teams at
+        scaling companies. Most clients see measurable improvement in sprint
+        predictability and delivery velocity within 30 days.
+      keyMessages:
+        - "Your team has grown — your process hasn't kept up. We fix that."
+        - "Not a training course. We work inside your team until it sticks."
+        - "Average 40% improvement in sprint predictability in 60 days."
+      objectionHandling:
+        - objection: "We already do agile."
+          response: >
+            Most teams say that. The question is whether it's giving you
+            predictable delivery and happy stakeholders. If yes, we're not
+            for you. If you're still missing commitments, there's a gap worth looking at.
+        - objection: "We're hiring our own Scrum Masters."
+          response: >
+            Great — we can accelerate that. It takes 6-12 months to hire
+            and ramp a Scrum Master. We can have impact in week one while
+            you build that capability in-house.
+        - objection: "We've tried agile before and it didn't work."
+          response: >
+            That's the most common thing we hear. Usually it's because the
+            methodology was applied rigidly without adapting to the team's
+            context. That's exactly what we do differently.
+        - objection: "Not the right time."
+          response: >
+            Totally understand — what would make this the right time?
+            I ask because delivery problems tend to compound, not resolve.
+        - objection: "What's the cost?"
+          response: >
+            It depends on team size and scope. The better question is
+            the cost of the current situation — missed releases, frustrated
+            engineers, stakeholder trust eroding. Worth a 20-minute call
+            to see if the numbers make sense?
+
+  - id: "product-digital-transformation"
+    name: "Product / Digital Transformation Leader"
+    priority: secondary
+    description: >
+      CPOs, COOs, and Digital leads at traditional companies (500–5000 employees)
+      going through digital transformation who need agile ways of working.
+
+    targeting:
+      roles:
+        - "Chief Product Officer"
+        - "CPO"
+        - "COO"
+        - "Chief Digital Officer"
+        - "Head of Digital Transformation"
+        - "VP Product"
+      companySizes: ["500-1000", "1001-5000"]
+      industries:
+        - "Financial Services"
+        - "Insurance"
+        - "Healthcare"
+        - "Manufacturing"
+        - "Retail"
+      fundingStages: ["Public", "PE-backed", "Large Enterprise"]
+
+    painPoints:
+      - "Tech team is waterfall, product team wants to move faster"
+      - "Digital transformation initiative stalled because of how teams work"
+      - "Post-acquisition: two teams with different ways of working can't align"
+      - "Board pressure on digital delivery speed with no process change"
+
+    buyingTriggers:
+      - "Announced a digital transformation programme"
+      - "Post-merger integration in progress"
+      - "New CDO or CPO in the last 6 months"
+      - "News about technology modernisation"
+
+channels:
+  active: ["linkedin", "email"]
+  preferences:
+    linkedin:
+      frequency: "primary"
+      style: "Short, personal, peer-to-peer"
+      notes: "Connect first, DM after acceptance. Never cold DM without connect."
+    email:
+      frequency: "parallel"
+      style: "Slightly longer than LinkedIn, include one specific insight"
+      notes: "Send same day as LinkedIn connect. Vary timing by 2-3 hours."
+
+signals:
+  buyingIntentSignals:
+    - "Hiring Scrum Master or Agile Coach"
+    - "Hiring Engineering Manager (multiple roles)"
+    - "LinkedIn post about delivery challenges"
+    - "LinkedIn post mentioning sprint, agile, or velocity"
+    - "Series A/B/C funding announced"
+    - "New CTO or engineering leader appointed"
+    - "Post-acquisition announcement"
+    - "Digital transformation press release"
+    - "Job posting mentioning 'Release Train Engineer' or 'SAFe'"
+
+  monitoringKeywords:
+    - "agile transformation"
+    - "delivery velocity"
+    - "engineering scaling"
+    - "sprint planning"
+    - "team alignment"
+    - "technical programme manager"
+    - "missed releases"
+    - "engineering process"
+
+  triggerEvents:
+    - "Series B or C round closed"
+    - "New CTO hired"
+    - "New CPO hired"
+    - "Company acquisition announced"
+    - "Digital transformation programme announced"
+    - "Engineering headcount grew >50% in 12 months"
+
+systemState:
+  onboardingComplete: true
+  lastUpdated: "2026-04-27"
+  version: 1

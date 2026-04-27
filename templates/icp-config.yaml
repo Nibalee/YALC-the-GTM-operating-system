@@ -1,0 +1,372 @@
+# ICP Configuration — Alacient
+# ─────────────────────────────────────────────────────────────────────────────
+# This is the single source of truth for targeting.
+# Edit this file when your ICP evolves — the pipeline reads it at runtime.
+#
+# HOW TO USE:
+#   Copy this file to ~/.gtm-os/tenants/{slug}/icp-config.yaml
+#   Fill in every section. The more specific, the better the leads.
+#   Run `yalc-gtm -t {slug} context:sync` after changes.
+# ─────────────────────────────────────────────────────────────────────────────
+
+client:
+  name: "Alacient"
+  slug: "alacient"
+  website: "https://alacient.com"
+  service: "Agile methodology and transformation consulting"
+
+# ─── WHO WE TARGET ────────────────────────────────────────────────────────────
+
+icp:
+  segments:
+    - id: "engineering-leader-scaling"
+      name: "Engineering Leader at Scaling Company"
+      priority: primary
+      description: >
+        CTOs and VPs of Engineering at mid-size companies (100–1000 employees)
+        that are scaling their engineering org and struggling with delivery
+        velocity, team coordination, or process maturity.
+
+      target_roles:
+        - "CTO"
+        - "VP Engineering"
+        - "VP of Engineering"
+        - "Head of Engineering"
+        - "Director of Engineering"
+        - "Chief Technology Officer"
+
+      target_company_sizes:
+        - "100-250"
+        - "251-500"
+        - "501-1000"
+
+      target_industries:
+        - "Software / SaaS"
+        - "FinTech"
+        - "HealthTech"
+        - "InsurTech"
+        - "Enterprise Software"
+        - "EdTech"
+        - "E-commerce Technology"
+        - "Logistics Technology"
+
+      target_geographies:
+        - "United Kingdom"
+        - "Germany"
+        - "Netherlands"
+        - "France"
+        - "Spain"
+        - "United States"
+        - "Canada"
+        - "Australia"
+
+      funding_stages:
+        - "Series A"
+        - "Series B"
+        - "Series C"
+        - "Growth"
+        - "PE-backed"
+
+    - id: "product-digital-transformation"
+      name: "Product / Digital Transformation Leader"
+      priority: secondary
+      description: >
+        CPOs, COOs, and Digital Transformation leads at traditional companies
+        undergoing digital transformation who need to adopt agile ways of working
+        across product and tech teams.
+
+      target_roles:
+        - "Chief Product Officer"
+        - "CPO"
+        - "COO"
+        - "Chief Digital Officer"
+        - "CDO"
+        - "Head of Digital Transformation"
+        - "VP Product"
+        - "Head of Product"
+        - "Director of Product"
+
+      target_company_sizes:
+        - "500-1000"
+        - "1000-5000"
+
+      target_industries:
+        - "Financial Services"
+        - "Insurance"
+        - "Healthcare"
+        - "Manufacturing"
+        - "Retail"
+        - "Media"
+        - "Telecommunications"
+
+      funding_stages:
+        - "Public"
+        - "PE-backed"
+        - "Large Enterprise"
+
+# ─── SIGNALS — what indicates a company needs us right now ───────────────────
+#
+# Signals are categorised by type and weighted by reliability.
+# Weight: 1–5 (5 = strong buying intent, 1 = weak indirect signal)
+#
+signals:
+  hiring_signals:
+    description: "Job postings that reveal process/agile gaps or active investment"
+    weight: 4
+    keywords:
+      - "Scrum Master"
+      - "Agile Coach"
+      - "Release Train Engineer"
+      - "SAFe"
+      - "Kanban"
+      - "Agile Transformation"
+      - "Engineering Manager"
+      - "Head of Delivery"
+      - "Programme Manager"
+      - "Delivery Manager"
+      - "Technical Programme Manager"
+      - "VP of Delivery"
+      - "Chief of Staff Engineering"
+    interpretation: >
+      Hiring Scrum Masters or Agile Coaches = they know they need agile but
+      can't do it alone. Hiring Engineering Managers at scale = growing fast
+      and need structure. All indicate the right stage for our engagement.
+
+  linkedin_activity_signals:
+    description: "Posts or comments by the prospect that reveal pain or intent"
+    weight: 5
+    keywords:
+      - "agile transformation"
+      - "delivery challenges"
+      - "missed deadline"
+      - "sprint"
+      - "team velocity"
+      - "scaling engineering"
+      - "technical debt"
+      - "cross-functional"
+      - "product-engineering alignment"
+      - "roadmap slippage"
+      - "release cadence"
+      - "dependencies blocking"
+      - "waterfall"
+      - "process improvement"
+    interpretation: >
+      A CTO posting about delivery pain or agile challenges is actively
+      thinking about the problem. This is the highest-intent signal.
+
+  company_event_signals:
+    description: "Company-level events that create process pressure"
+    weight: 4
+    keywords:
+      - "Series B"
+      - "Series C"
+      - "acquisition"
+      - "merger"
+      - "digital transformation"
+      - "new CTO"
+      - "new CPO"
+      - "reorg"
+      - "rapid growth"
+      - "100 engineers"
+      - "doubling team"
+      - "scaling team"
+    interpretation: >
+      Funding rounds create scaling pressure — they need to grow the team fast
+      and need process to support it. Acquisitions create alignment needs.
+      New C-suite hires often want to bring in new methodology.
+
+  tech_stack_signals:
+    description: "Tools that indicate agile interest but possible implementation gaps"
+    weight: 2
+    indicators:
+      present:
+        - "Jira"
+        - "Confluence"
+        - "Azure DevOps"
+        - "Linear"
+        - "Shortcut"
+      interpretation: >
+        Having agile tooling but still struggling = they're trying but not
+        getting value. This is a soft signal — combine with others.
+      absent:
+        - "Any structured PM tooling"
+      absent_interpretation: >
+        No PM tooling at 200+ employees = strong indicator of process chaos.
+
+  news_signals:
+    description: "Public news that suggests transformation pressure"
+    weight: 3
+    patterns:
+      - "announced digital transformation"
+      - "technology overhaul"
+      - "modernising systems"
+      - "engineering restructure"
+      - "post-merger integration"
+      - "IPO preparation"
+    interpretation: >
+      Public transformation announcements = board-level commitment to change.
+      These companies have budget and urgency.
+
+# ─── MINIMUM SIGNAL THRESHOLD ─────────────────────────────────────────────────
+# Lead must pass this score to enter the pipeline
+signal_scoring:
+  minimum_to_qualify: 6        # sum of signal weights
+  strong_fit_threshold: 12     # auto-advance without manual review
+  require_at_least_one:
+    - "hiring_signals"
+    - "linkedin_activity_signals"
+    - "company_event_signals"
+
+# ─── EXCLUSIONS — who to never contact ───────────────────────────────────────
+
+exclusions:
+  company_types:
+    - "Agile consultancy"
+    - "Scrum training company"
+    - "Agile coaching firm"
+    - "Technology staffing agency"
+    - "IT recruitment"
+
+  company_sizes:
+    too_small: 100             # below this = too early, no budget
+    too_large: 10000           # above this = have internal programmes
+
+  keywords_in_company_description:
+    - "agile consulting"
+    - "scrum certification"
+    - "SAFe consulting"
+    - "agile training"
+    - "coaching and consulting"
+
+  do_not_contact_domains: []   # add specific domains here e.g. competitor.com
+
+  competitor_companies:
+    - "Scaled Agile"
+    - "Agile Alliance"
+    - "Scrum.org"
+    - "Agile Centre"
+
+# ─── LEAD SCORING WEIGHTS ─────────────────────────────────────────────────────
+
+scoring:
+  title_seniority:
+    C_level: 30
+    VP: 25
+    Head_of: 20
+    Director: 15
+    Manager: 5
+
+  company_size:
+    "100-250": 15
+    "251-500": 25
+    "501-1000": 20
+    "1001-5000": 10
+    other: 0
+
+  funding_stage:
+    "Series A": 15
+    "Series B": 25
+    "Series C": 20
+    "Growth": 20
+    "PE-backed": 15
+    "Public": 10
+
+  signal_match:
+    per_weight_point: 5        # 5 points per signal weight unit matched
+
+  pass_threshold: 60           # minimum total score to enter campaign
+  strong_fit: 80               # shown as "Strong" fit in UI
+
+# ─── CHANNELS & SEQUENCE ──────────────────────────────────────────────────────
+
+outreach:
+  primary_channel: "linkedin"
+  secondary_channel: "email"
+  parallel: true               # run both channels simultaneously
+
+  linkedin_sequence:
+    step_1:
+      type: "connect_request"
+      timing: "day_0"
+      note_max_chars: 300
+
+    step_2:
+      type: "dm"
+      timing: "day_2"          # 2 days after connect accepted
+      name: "DM1"
+
+    step_3:
+      type: "dm"
+      timing: "day_5"          # 5 days after DM1 if no reply
+      name: "DM2"
+
+  email_sequence:
+    step_1:
+      type: "email"
+      timing: "day_0"
+      name: "Email1"
+
+    step_2:
+      type: "email"
+      timing: "day_4"          # 4 days after Email1 if no reply
+      name: "Email2_followup"
+
+    step_3:
+      type: "email"
+      timing: "day_10"         # 10 days after Email2 if no reply
+      name: "Email3_breakup"
+
+  daily_limits:
+    linkedin_connects: 30      # hard cap — enforced by rate limiter
+    emails: 100
+
+  send_window:
+    timezone: "Europe/London"
+    days: ["monday", "tuesday", "wednesday", "thursday", "friday"]
+    hours: { start: 8, end: 17 }
+
+# ─── COPY GUIDELINES ──────────────────────────────────────────────────────────
+# The Copywriter agent reads these as constraints.
+
+copy_rules:
+  tone: "Direct, peer-to-peer. No corporate speak. Short sentences."
+  style: "Consultative, not salesy. Lead with their pain, not our service."
+
+  always_do:
+    - "Reference a specific signal from their profile or company"
+    - "Keep LinkedIn connect note under 250 characters"
+    - "Keep DM1 under 80 words"
+    - "Lead with their problem, not our solution"
+    - "End with a low-friction CTA (question, not 'book a call')"
+    - "Use their first name only"
+
+  never_do:
+    - "Use the word 'synergy', 'leverage', 'solutions', 'game-changer'"
+    - "Open with 'I hope this message finds you well'"
+    - "Send to someone who has already replied"
+    - "Mention competitors by name"
+    - "Make claims without a specific proof point"
+    - "Use more than one question mark per message"
+
+  personalization_anchors:
+    - "Recent LinkedIn post they wrote"
+    - "Specific job posting their company has open"
+    - "Funding round amount and recency"
+    - "Company milestone (new product, acquisition)"
+    - "Mutual connection or shared interest"
+
+# ─── DAILY PIPELINE SETTINGS ─────────────────────────────────────────────────
+
+pipeline:
+  daily_trigger: "09:00"        # local time
+  learning_trigger: "18:00"
+  leads_per_day: 60             # Prospector target
+  expected_enrichment_rate: 0.75  # ~75% get valid email
+  reply_monitor_schedule: "every_2_hours"
+
+  human_review_gates:
+    - condition: "icp_score > 85"
+      action: "hold_for_review"
+      queue: "/review"
+    - condition: "negative_signal_detected"
+      action: "flag_for_review"

@@ -1,0 +1,79 @@
+# Context Adapters — Obsidian Vault Sync
+# ─────────────────────────────────────────────────────────────────────────────
+# Copy to: ~/.gtm-os/tenants/{slug}/adapters.yaml
+#
+# This config tells GTM-OS where your Obsidian vault is and which folders
+# to sync into the memory store. After first sync, a watcher picks up
+# every save within 30 seconds automatically.
+#
+# RUN AFTER EDITING:
+#   yalc-gtm -t {slug} context:sync
+# ─────────────────────────────────────────────────────────────────────────────
+
+adapters:
+  - id: markdown-folder
+    enabled: true
+
+    # REQUIRED: Absolute path to your Obsidian vault (or subfolder within it)
+    # Examples:
+    #   base_dir: "/Users/yourname/ObsidianVault"
+    #   base_dir: "/Users/yourname/Documents/SecondBrain"
+    #   base_dir: "/Users/yourname/ObsidianVault/02_Clients/Alacient"
+    base_dir: "/Users/yourname/ObsidianVault"
+
+    # Which paths to index (relative to base_dir)
+    # Supports: literal paths, * (any file in dir), ** (recursive)
+    paths:
+      # Agent playbooks — what each agent knows how to do
+      - "00_System/Agents/**/*.md"
+
+      # Company content — brand voice, value props, pain points, case studies
+      - "01_Company/**/*.md"
+
+      # Client-specific — ICP, history, personas, winning messages
+      # IMPORTANT: scope to your specific client folder only
+      - "02_Clients/Alacient/**/*.md"
+
+      # Intelligence — channel insights, timing, reply patterns
+      - "03_Intelligence/**/*.md"
+
+    # Sync behaviour
+    sync:
+      # Rebuild embeddings for changed files on every sync
+      incremental: true
+
+      # Debounce file changes before re-syncing (milliseconds)
+      # 30s default prevents thrashing during rapid Obsidian edits
+      debounce_ms: 30000
+
+      # Maximum chunk size in approximate tokens
+      # Keep at 800 for best retrieval precision
+      chunk_max_tokens: 800
+      chunk_min_tokens: 500
+
+# ─── NOTES ON WHAT GETS INDEXED ──────────────────────────────────────────────
+#
+# The adapter chunks each markdown file by heading hierarchy (h1/h2 boundaries).
+# Each chunk gets embedded and stored in the vector memory store.
+#
+# GOOD for retrieval:
+#   ✓ Files with clear ## heading structure
+#   ✓ Frontmatter with agent/segment/topic metadata
+#   ✓ Concrete, specific content (real examples, actual numbers)
+#   ✓ Shorter focused files (one topic per file)
+#
+# LESS effective:
+#   ✗ Wikilinks [[Page Name]] — indexes as text, doesn't pull linked content
+#   ✗ Dataview queries — stored as code blocks, not resolved
+#   ✗ Very long files with no heading structure (become one giant chunk)
+#   ✗ Files with only images or tables (low text density)
+#
+# FRONTMATTER TEMPLATE for Obsidian notes (improves retrieval precision):
+#
+# ---
+# agent: copywriter
+# segment: engineering-leader-scaling
+# topic: agile-transformation
+# channel: linkedin
+# confidence: high
+# ---
