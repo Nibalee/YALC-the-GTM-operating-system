@@ -1,6 +1,6 @@
-# Agentic GTM System — Architecture & Playbook
+# Alacient Agentic Core System — Architecture & Playbook
 
-> End-to-end documentation for running a fully autonomous, multi-agent outbound GTM system inside Claude Code. No Anthropic API key required for the batch pipeline — Claude Code is the AI layer.
+> End-to-end documentation for the fully autonomous, multi-agent outbound system built for Alacient. No Anthropic API key required for the batch pipeline — Claude Code is the AI layer.
 
 ---
 
@@ -582,4 +582,4 @@ ONGOING (automatic after setup)
 
 ---
 
-*Architecture version: 1.0 — April 2026*
+*Alacient Agentic Core System — Architecture v1.0 — April 2026*

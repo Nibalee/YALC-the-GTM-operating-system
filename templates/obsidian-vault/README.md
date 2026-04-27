@@ -1,6 +1,6 @@
-# GTM-OS Obsidian Vault — Starter Template
+# Alacient Agentic Core System — Obsidian Vault Starter
 
-This folder contains the starter structure for your GTM-OS Obsidian vault.
+This folder contains the Obsidian vault structure for the Alacient Agentic Core System.
 Copy the entire folder into your Obsidian vault and fill in the blanks.
 
 ## Folder Map

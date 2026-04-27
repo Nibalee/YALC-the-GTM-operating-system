@@ -1,6 +1,6 @@
-# Getting Started — Renna
+# Alacient Agentic Core System — Getting Started (Renna)
 
-> Step-by-step setup guide for running the Alacient GTM system.
+> Step-by-step setup guide for operating the Alacient Agentic Core System.
 > Work through these phases in order. Each phase builds on the previous one.
 > Estimated total time: **2–3 hours** (most of it waiting for account approvals).
 
@@ -389,4 +389,4 @@ Gather these before Phase 1:
 
 ---
 
-*Created: April 2026 | For questions, ask in the Claude Code session.*
+*Alacient Agentic Core System — April 2026 | For questions, ask in the Claude Code session.*

@@ -1,323 +1,226 @@
-# YALC — The Open-Source GTM Operating System
+# Alacient Agentic Core System
 
-![CI](https://github.com/Othmane-Khadri/YALC-the-GTM-operating-system/actions/workflows/ci.yml/badge.svg)
-[![npm version](https://img.shields.io/npm/v/yalc-gtm-os.svg)](https://www.npmjs.com/package/yalc-gtm-os)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Node](https://img.shields.io/badge/Node-%3E%3D20-brightgreen.svg)](https://nodejs.org/)
+> A fully autonomous, multi-agent outbound system built for Alacient.
+> Finds leads, enriches them, researches buying signals, writes personalised outreach, and handles replies — daily, without manual intervention.
 
-> AI plans your campaigns, qualifies your leads, and learns from every interaction.
+---
 
-YALC is an open-source, AI-native operating system for running any GTM campaign. CLI-first. Intelligence compounds from every interaction.
+## What This Is
 
-## Quick Start
+The Alacient Agentic Core System is a purpose-built AI agent pipeline that runs Alacient's entire outbound motion. Every day at 09:00 it wakes up, finds companies that need agile transformation, researches each prospect, writes personalised LinkedIn and email messages grounded in their specific signals, dispatches outreach, and handles replies 24/7 through a persistent server layer.
 
-Node.js 20 or higher required ([nodejs.org](https://nodejs.org/)).
+Claude Code is the AI brain. The underlying GTM-OS engine handles all data operations — lead search, enrichment, campaign sequencing, CRM sync. No separate Anthropic API key required for the daily pipeline.
 
-```bash
-npm install -g yalc-gtm-os
-yalc-gtm start
+---
+
+## System Architecture
+
+```
+09:00 DAILY TRIGGER
+       │
+       ▼
+┌─────────────────────────────────────────────┐
+│         ORCHESTRATOR AGENT                  │
+│  Reads ICP, intel store, pipeline health.   │
+│  Decides today's targeting and delegates.   │
+└──┬──────────┬──────────────────────────┬───┘
+   ▼          ▼                          ▼
+PROSPECTOR  ENRICHER            LEARNING AGENT (18:00)
+   ▼
+INTELLIGENCE COLLECTOR (per lead research)
+   ▼
+COPYWRITER (Obsidian vault → personalised messages)
+   ▼
+OUTREACH DISPATCHER
+   │
+   ├── LinkedIn connects (Unipile, 30/day)
+   └── Email sequences (Instantly)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ALWAYS-ON (24/7 PM2 server)
+   │
+   ├── Unipile webhook → intent classifier
+   ├── Instantly webhook → intent classifier
+   │
+   ├── OOO / Unsub / Bounce → auto-handled (no AI)
+   └── Interested / Question → Negotiator Agent (spawned on demand)
 ```
 
-That is the whole installation. The `start` command writes its config to `~/.gtm-os/` and walks you through the rest.
+Full architecture with Mermaid diagrams: [`docs/AGENTIC-SYSTEM.md`](docs/AGENTIC-SYSTEM.md)
 
-### Updating
+---
 
-```bash
-npm update -g yalc-gtm-os
-```
+## Agents
 
-### From source (contributors)
-
-If you want to hack on YALC itself, clone the repo and link locally:
-
-```bash
-git clone https://github.com/Othmane-Khadri/YALC-the-GTM-operating-system.git
-cd YALC-the-GTM-operating-system
-corepack enable && corepack prepare pnpm@latest --activate
-pnpm install
-pnpm link --global
-```
-
-If `pnpm link --global` fails with `ERR_PNPM_NO_GLOBAL_BIN_DIR` (or you are on Windows), run YALC in-repo with `pnpm cli start` instead.
-
-The `start` command walks you through 4 steps:
-
-1. **Environment** — Collects API keys. All keys are optional; setup never blocks on a missing one. Without `ANTHROPIC_API_KEY` you can still complete onboarding — Steps 3–4 are skipped and can be finished later by running `yalc-gtm onboard` then `yalc-gtm configure`. When run inside Claude Code, both `ANTHROPIC_API_KEY` and `FIRECRAWL_API_KEY` default to skip (the parent CC session covers LLM + WebFetch).
-2. **Company Context** — Interactive interview about your company, ICP, pain points, competitors, and voice. Optionally scrapes your website for additional context.
-3. **Framework** *(skipped without an Anthropic key)* — Claude synthesizes everything into a structured GTM framework (segments, signals, positioning, competitors). You see a summary and confirm before anything is written to disk.
-4. **Goals & Config** *(skipped without an Anthropic key)* — Claude recommends goals and generates qualification rules, outreach templates, and search queries.
-
-You'll end with a readiness report showing what's unlocked and a suggested first command.
-
-### Onboarding modes
-
-When you run `yalc-gtm start`, you can choose how to provide context: answer questions one by one, paste a long-form response covering all questions at once, or hand over your website + documents and let YALC infer the positioning for you. Pick whichever matches the material you already have ready.
-
-### After Setup
-
-```bash
-# Easiest: describe what you want in natural language and let YALC plan the work
-yalc-gtm orchestrate "find 10 SaaS CTOs matching my ICP and qualify them"
-
-# Create a campaign
-yalc-gtm campaign:create --title "Q2 Outbound" --hypothesis "VP Eng responds to pain-point messaging"
-
-# Track campaign progress
-yalc-gtm campaign:track --dry-run
-
-# Or qualify a lead list you already have (CSV or JSON)
-yalc-gtm leads:qualify --source csv --input ./your-leads.csv --dry-run
-
-# Send via a non-default email provider (e.g. Brevo via the MCP template)
-yalc-gtm email:send --provider brevo --to lead@example.com --body "Hi there"
-```
-
-### Non-Interactive Setup
-
-For CI or automation, set your keys in `.env.local` (see `.env.example`) and run:
-
-```bash
-yalc-gtm start --non-interactive
-```
-
-## Recommended workflow: drive YALC from your IDE chat
-
-YALC is designed to be driven by an AI assistant — Claude Code, Cursor, Copilot, or whatever you have open. Once it's installed globally, you don't need to remember commands. You just talk to your assistant.
-
-Typical flow inside Cursor or VS Code with Claude Code:
-
-1. Install once: `npm i -g yalc-gtm-os`.
-2. Open your IDE and ask in plain language: *"Set up YALC for my company, then find 10 SaaS CTOs and qualify them."*
-3. The assistant runs the commands. Interactive prompts from `start` show up in the same chat panel; you answer them inline.
-
-Every command also works directly in a terminal if you prefer that style. The "Using YALC from Claude Code" section below has the details on how Claude Code integrates with YALC's commands and how the LLM hand-off works when no `ANTHROPIC_API_KEY` is set.
-
-## Features at a Glance
-
-- **17 built-in skills** — qualify, scrape, campaign, orchestrate, personalize, competitive-intel, and more
-- **7 providers** — Unipile, Crustdata, Firecrawl, Notion, FullEnrich, Instantly, Anthropic
-- **Multi-channel campaigns** — LinkedIn + Email with A/B variant testing
-- **Intelligence store** — learns from every campaign outcome (hypothesis → validated → proven)
-- **Statistical significance** — chi-squared testing to pick variant winners
-- **Campaign dashboard** — real-time analytics, funnel views, Claude-powered Q&A
-- **Rate limiting** — DB-backed token bucket on all external sends
-- **Outbound validation** — every message checked before send, hard blocks on violations
-- **Background agents** — launchd-integrated for automated campaign tracking
-- **Natural language orchestration** — describe what you want, YALC plans the workflow
-- **Swappable email providers** — Instantly built in, plus drop-in MCP templates for Brevo, Mailgun, and SendGrid (`provider:add --mcp <name>` then `email:send --provider <name>`)
-
-<!-- ## Demo
-![YALC Demo](demo.gif)
-Demo GIF will be added here -->
-
-## Using YALC from Claude Code (IDE or Terminal)
-
-YALC works the same whether you run it from a coding IDE (VS Code, Cursor) or a standalone terminal. The CLI uses the same interactive prompts in both.
-
-**IDE (VS Code / Cursor with Claude Code extension):**
-You can ask Claude Code to run commands for you. For the initial setup, it's better to run `yalc-gtm start` yourself in the integrated terminal so you can answer the interactive prompts. After that, Claude Code can run any YALC command on your behalf — qualifying leads, creating campaigns, tracking results.
-
-If your `ANTHROPIC_API_KEY` is already in your environment (common in Claude Code sessions), the `start` command detects it automatically and skips the prompt.
-
-**Terminal (standalone):**
-Run commands directly. The interactive prompts work as expected in any terminal emulator.
-
-### Running YALC inside Claude Code (no extra keys required)
-
-When YALC detects a parent Claude Code session — via `CLAUDECODE`, `CLAUDE_CODE_ENTRYPOINT`, or `CLAUDE_CODE_SSE_PORT` env vars set by Claude Code itself — both the **Anthropic** and **Firecrawl** keys become **optional**:
-
-- The parent CC session already provides LLM reasoning, so a separate Anthropic API key isn't needed for ad-hoc planning, qualification, or personalization (just ask Claude Code).
-- Claude Code's built-in `WebFetch` tool covers single-URL scrapes, so Firecrawl is only needed for JS-rendered pages, multi-page crawls, or web search.
-- Claude Code's `WebSearch` is also honored when onboarding needs to discover a company URL — if you skip the website prompt, YALC asks the parent CC session to run a `WebSearch` for `"<company> official website"` instead of calling Firecrawl.
-
-**What works in Claude Code mode with zero provider keys:**
-
-| Command | Works? | Notes |
+| Agent | Role | Runs |
 |---|---|---|
-| `start` | ✓ | Steps 1–2 complete; Steps 3–4 (framework synth, goals) are skipped with a "come back after adding ANTHROPIC_API_KEY" message |
-| `leads:import` | ✓ | Pure CSV/JSON ingest, no LLM |
-| `campaign:create` (with `--title` + `--hypothesis`) | ✓ | LLM is only used for the optional auto-plan path |
-| `campaign:track`, `campaign:schedule`, `campaign:report` (data-only) | ✓ | Pure CRUD against Notion / DB |
-| `notion:sync`, `notion:bootstrap` | ✓ | |
-| `email:send`, `email:status` | ✓ | Sends pre-written copy via Instantly |
-| `orchestrate`, `leads:qualify`, `personalize`, `competitive-intel` | Redirect | Prints a message and exits cleanly without doing the work. Re-issue the request inside a Claude Code session so the parent LLM runs it, or add an `ANTHROPIC_API_KEY` and run again standalone. |
+| **Orchestrator** | Daily strategy, delegates to all others | 09:00 daily |
+| **Prospector** | Crustdata search, dedup, initial filter | Inside daily pipeline |
+| **Enricher** | FullEnrich email/phone, LinkedIn confirm | Inside daily pipeline |
+| **Intelligence Collector** | Per-lead research: posts, jobs, news, tech stack | Inside daily pipeline |
+| **Copywriter** | Personalised messages from Obsidian vault + lead intel | Inside daily pipeline |
+| **Outreach Dispatcher** | Creates campaign, fires connects + email sequences | Inside daily pipeline |
+| **Negotiator** | Handles interested/question replies, drafts responses | On-demand, per reply |
+| **Learning Agent** | Updates intelligence store + Obsidian vault from outcomes | 18:00 daily |
 
-**When you DO still want an Anthropic key:**
+---
 
-- Running YALC standalone (no parent CC session)
-- Running YALC under cron, launchd, CI, or any unattended scheduler
-- You want the qualifier / personalizer / orchestrator to run autonomously without you babysitting it from a CC chat
+## ICP — Who We Target
 
-**Web-fetch provider override** — set `WEB_FETCH_PROVIDER` in `.env.local`:
+**Primary:** CTOs, VPs Engineering, Heads of Engineering at SaaS/tech companies (100–1,000 employees, Series A–C) where engineering growth has outpaced process maturity.
 
-- `auto` (default) — use Firecrawl if present, otherwise hand off to Claude Code's WebFetch
-- `firecrawl` — force Firecrawl, error if no key
-- `claude-code` — never call Firecrawl; commands that need a web fetch will emit a "fetch this URL with WebFetch and re-run with `--input <file>`" handoff
+**Secondary:** CPOs, COOs, Digital Transformation leads at traditional companies (500–5,000 employees) going through digital transformation.
 
-**File Structure — Where Things Live:**
+**Signals we look for:**
+- Hiring Scrum Masters, Agile Coaches, Engineering Managers
+- LinkedIn posts about delivery challenges, sprint failures, team scaling
+- Series A/B/C funding (scaling pressure)
+- New CTO or CPO in post (change agenda)
+- Post-acquisition or merger (process alignment need)
+- Digital transformation announcements
 
-```
-~/.gtm-os/                          Your GTM brain (persists across projects)
-├── config.yaml                     Provider settings, Notion IDs, rate limits
-├── framework.yaml                  GTM framework — ICP, positioning, signals
-├── qualification_rules.md          Lead qualification patterns (auto-generated)
-├── campaign_templates.yaml         Outreach copy templates (auto-generated)
-├── search_queries.txt              Monitoring keywords (auto-generated)
-├── logs/agents/                    Background agent run logs (JSON per run)
-└── tenants/<slug>/                 Per-tenant overrides (multi-company mode)
+Full signal definitions: [`templates/icp-config.yaml`](templates/icp-config.yaml)
 
-./data/                             Working data (in your project directory)
-├── leads/                          CSV/JSON lead lists for qualification
-├── intelligence/                   Campaign learnings and insights
-└── campaigns/                      Campaign exports and reports
-```
+---
 
-When talking to Claude Code, reference these locations directly:
-- "Update my qualification rules" → edits `~/.gtm-os/qualification_rules.md`
-- "Add a segment to my framework" → edits `~/.gtm-os/framework.yaml`
-- "Qualify leads from this CSV" → reads from `./data/leads/`
+## Outreach Channels & Sequence
 
-## Architecture
+**LinkedIn** (primary):
+- Day 0: Connection request with personalised note (< 300 chars)
+- Day +2: DM 1 after connect accepted (< 80 words)
+- Day +5: DM 2 if no reply (new angle, offer content)
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                        CLI Layer                          │
-│  campaign:track · campaign:create · leads:qualify · ...   │
-├──────────────────────────────────────────────────────────┤
-│                      Skills Layer                         │
-│  qualify · scrape-linkedin · answer-comments · email ·    │
-│  orchestrate · visualize · monthly-report                 │
-├──────────────────────────────────────────────────────────┤
-│                    Providers Layer                         │
-│  Unipile · Crustdata · Firecrawl · Notion · FullEnrich   │
-├──────────────────────────────────────────────────────────┤
-│                    Services Layer                          │
-│  API wrappers · Rate limiter · Outbound validator         │
-├──────────────────────────────────────────────────────────┤
-│                    Data Layer                              │
-│  Drizzle ORM · SQLite/Turso · Intelligence Store          │
-└──────────────────────────────────────────────────────────┘
-```
+**Email** (parallel, same day as LinkedIn connect):
+- Day 0: Email 1 (4 sentences, plain text)
+- Day +4: Email 2 follow-up (Re: same thread)
+- Day +10: Email 3 breakup
 
-**Three-layer pattern:** Service (API wrapper) → Provider (StepExecutor) → Skill (user-facing operation). Never skip layers.
+Rate limits enforced: 30 LinkedIn connects/day hard cap. All messages pass validation before send.
 
-## Providers
+---
 
-| Provider | Capabilities | Env Var |
-|----------|-------------|---------|
-| **Unipile** | LinkedIn search, connections, DMs, scraping | `UNIPILE_API_KEY`, `UNIPILE_DSN` |
-| **Crustdata** | Company/people search, enrichment | `CRUSTDATA_API_KEY` |
-| **Firecrawl** | Web scraping, search (optional inside Claude Code) | `FIRECRAWL_API_KEY` |
-| **Notion** | Database sync, page management | `NOTION_API_KEY` |
-| **FullEnrich** | Email/phone enrichment | `FULLENRICH_API_KEY` |
-| **Instantly** | Cold email sending, sequence management | `INSTANTLY_API_KEY` |
-| **Anthropic** | AI planning, qualification, personalization (optional inside Claude Code) | `ANTHROPIC_API_KEY` |
+## Knowledge Layer — Obsidian Vault
 
-## Skills
-
-| Skill | Category | Description |
-|-------|----------|-------------|
-| `qualify-leads` | data | 7-gate lead qualification pipeline |
-| `scrape-linkedin` | data | Scrape post engagers (likers/commenters) |
-| `answer-comments` | outreach | Reply to LinkedIn post comments |
-| `email-sequence` | content | Generate email drip sequences |
-| `visualize-campaigns` | analysis | Campaign dashboards |
-| `monthly-campaign-report` | analysis | Cross-campaign intelligence report |
-| `orchestrate` | integration | Multi-step workflow from natural language |
-
-## CLI Commands
+Every agent queries the Obsidian vault at runtime via semantic search. The vault contains:
 
 ```
-start                   Guided onboarding — keys, context, framework, goals in one flow
-setup                   Check API keys and provider connectivity
-onboard                 Build GTM framework from profile/website
-campaign:track          Poll Unipile, advance sequences, sync Notion
-campaign:create         Create campaign with A/B variant testing
-campaign:report         Generate weekly intelligence report
-campaign:monthly-report Cross-campaign monthly report
-campaign:dashboard      Open visualization dashboard
-leads:qualify           Run 7-gate qualification pipeline
-leads:scrape-post       Scrape LinkedIn post engagers
-leads:import            Import leads from CSV/JSON/Notion
-linkedin:answer-comments Reply to LinkedIn post comments
-email:send              Send a sequence or single message (pick the email provider with --provider <name>)
-email:create-sequence   Generate email drip sequence
-notion:sync             Bidirectional SQLite ↔ Notion sync
-notion:bootstrap        Import existing Notion data to SQLite
-orchestrate             Natural language → phased skill execution
-agent:run               Run background agent immediately
-agent:install           Install agent as launchd service
-agent:list              List agents with last run status
+00_System/Agents/       Agent playbooks (what each agent does, how)
+01_Company/             Brand voice, value propositions, objection handling, case studies
+02_Clients/Alacient/    ICP definition, campaign history, winning messages
+03_Intelligence/        Channel insights, timing patterns, reply examples
 ```
 
-The listing above covers the common commands. The full surface also includes the `crm:*` (CRM sync and import), `email:*` (send, accounts, status), `provider:*`, `memory:*`, `context:*`, `pipeline:*`, `skills:*`, and `tenant:*` families, plus `configure`, `doctor`, `update`, `personalize`, `competitive-intel`, `test-run`, and `campaign:schedule`. Run `yalc-gtm --help` for the complete list.
+The vault syncs automatically — save a note in Obsidian, agents pick it up within 30 seconds.
 
-All commands that send or write support `--dry-run`. See [Command Reference](docs/commands.md) for full details, flags, and examples.
+Vault starter: [`templates/obsidian-vault/`](templates/obsidian-vault/)
+
+---
+
+## Getting Started
+
+**For Renna (system operator):** [`docs/RENNA-GETTING-STARTED.md`](docs/RENNA-GETTING-STARTED.md)
+
+**API keys needed:**
+
+| Provider | What it does | Required? |
+|---|---|---|
+| Crustdata | Lead search + company enrichment | Yes |
+| Unipile | LinkedIn connects + DMs | Yes |
+| FullEnrich | Email + phone finder | Yes |
+| Instantly | Cold email sequences | Yes |
+| Notion | CRM sync | Optional |
+
+No Anthropic API key needed for the daily pipeline — Claude Code is the AI layer.
+
+---
+
+## Configuration Files
+
+| File | What it controls |
+|---|---|
+| `templates/icp-config.yaml` | ICP definition, signals, scoring, sequence timing, copy rules |
+| `templates/framework.yaml` | Full GTM framework — positioning, segments, voice, signals |
+| `templates/qualification-rules.md` | 7-gate lead qualification pipeline rules |
+| `templates/adapters.yaml` | Obsidian vault sync configuration |
+
+Copy these to `~/.gtm-os/tenants/alacient/` and fill in before first run.
+
+---
+
+## CLI Reference
+
+The system is operated through Claude Code conversations. The CLI handles data operations:
+
+```bash
+# Check system health
+npx tsx src/cli/index.ts -t alacient doctor
+
+# Sync Obsidian vault after edits
+npx tsx src/cli/index.ts -t alacient context:sync
+
+# Check active campaigns
+npx tsx src/cli/index.ts -t alacient campaign:status
+
+# Run campaign tracker manually
+npx tsx src/cli/index.ts -t alacient campaign:track --dry-run
+
+# List qualified leads
+npx tsx src/cli/index.ts -t alacient leads:list
+
+# Check provider status
+npx tsx src/cli/index.ts -t alacient provider:list
+```
+
+All commands that send or write support `--dry-run`. Full command reference: [`docs/commands.md`](docs/commands.md)
+
+---
+
+## Running the Always-On Server
+
+The Hono server handles inbound replies 24/7 via webhooks from Unipile and Instantly.
+
+```bash
+# Install PM2
+npm install -g pm2
+
+# Start the server
+pm2 start "npx tsx src/lib/server/index.ts" --name alacient-core
+pm2 save
+pm2 startup
+
+# View the review dashboard
+open http://localhost:3847/review
+```
+
+Register webhooks:
+- Unipile → `POST http://your-server:3847/api/inbound/unipile`
+- Instantly → `POST http://your-server:3847/api/inbound/instantly`
+
+---
 
 ## Documentation
 
-| Guide | What it covers |
-|-------|---------------|
-| [First Run Tutorial](docs/first-run.md) | Step-by-step walkthrough of `start`, plus 3 mini-tutorials |
-| [Provider Setup](docs/providers.md) | How to get and configure API keys for each provider |
-| [Command Reference](docs/commands.md) | Every CLI command with flags, examples, and expected output |
-| [Skills Catalog](docs/skills.md) | All 17 built-in skills with scenarios and decision tree |
-| [MCP Integration](docs/mcp.md) | How MCP works with GTM-OS, current status, and roadmap |
-| [Troubleshooting](docs/troubleshooting.md) | Common errors and fixes, organized by layer |
-| [Background Agents](docs/background-agents.md) | Agent architecture, creation, scheduling |
-| [Intelligence Store](data/intelligence/README.md) | Intelligence schema, categories, confidence lifecycle |
-| [Architecture](docs/ARCHITECTURE.md) | High-level project map |
-| [Systems Architecture](docs/SYSTEMS_ARCHITECTURE.md) | Deep dive into 8 core systems |
+| Document | What it covers |
+|---|---|
+| [`docs/AGENTIC-SYSTEM.md`](docs/AGENTIC-SYSTEM.md) | Full architecture with Mermaid diagrams — all agents, data flow, context flow, lead lifecycle |
+| [`docs/RENNA-GETTING-STARTED.md`](docs/RENNA-GETTING-STARTED.md) | Step-by-step operator setup guide |
+| [`templates/icp-config.yaml`](templates/icp-config.yaml) | ICP and signal definitions — edit when targeting changes |
+| [`templates/obsidian-vault/README.md`](templates/obsidian-vault/README.md) | Vault structure and setup instructions |
+| [`docs/providers.md`](docs/providers.md) | Provider API key setup |
+| [`docs/commands.md`](docs/commands.md) | Full CLI command reference |
+| [`docs/troubleshooting.md`](docs/troubleshooting.md) | Common errors and fixes |
 
-## Configuration
+---
 
-YALC uses `~/.gtm-os/config.yaml` for persistent configuration:
+## Key Guardrails
 
-```yaml
-notion:
-  campaigns_ds: ""
-  leads_ds: ""
-  variants_ds: ""
-  parent_page: ""
-unipile:
-  daily_connect_limit: 30
-  sequence_timing:
-    connect_to_dm1_days: 2
-    dm1_to_dm2_days: 3
-  rate_limit_ms: 3000
-qualification:
-  rules_path: ~/.gtm-os/qualification_rules.md
-  exclusion_path: ~/.gtm-os/exclusion_list.md
-  disqualifiers_path: ~/.gtm-os/company_disqualifiers.md
-  cache_ttl_days: 30
-crustdata:
-  max_results_per_query: 50
-fullenrich:
-  poll_interval_ms: 2000
-  poll_timeout_ms: 300000
-```
+- **30 LinkedIn connects/day** — hard cap enforced by rate limiter, never exceeded
+- **All messages validated** before send — outbound validator blocks rule violations
+- **Never contact replied leads** — sequence engine checks reply status before every action
+- **Human review gate** — leads with ICP score > 85 held for approval before first contact
+- **Intent classifier first** — simple replies (OOO, unsubscribe, bounce) handled without AI, never reaching the Negotiator
 
-### Env file precedence
+---
 
-YALC loads `~/.gtm-os/.env` automatically on every run (followed by `.env.local` in the current working directory as a fallback). Variables already present in your shell environment win — `~/.gtm-os/.env` only fills in keys that aren't already set. To stop using a provider, remove its line from `~/.gtm-os/.env` rather than `unset`-ing it in your terminal, since the file is reloaded on the next invocation.
-
-## Key Design Decisions
-
-- **Intelligence everywhere**: Every campaign outcome feeds the intelligence store. The system learns what works per segment/channel.
-- **Outbound validation**: Every human-facing message passes through `validateMessage()`. Hard violations block sends.
-- **Rate limiting**: DB-backed token bucket rate limiter on all external sends (LinkedIn connects, DMs, emails).
-- **No silent mocks**: Provider registry throws `ProviderNotFoundError` with suggestions instead of silently falling back to mock data.
-- **Transactions**: All campaign tracker DB writes are wrapped in Drizzle transactions.
-
-## Contributing
-
-1. Follow the three-layer pattern: Service → Provider → Skill
-2. Run `pnpm typecheck` after every file change
-3. Support `--dry-run` on any command that sends or writes
-4. Never log API keys — use `sk-...redacted` pattern
-5. Wire campaign outcomes to the intelligence store
-
-## License
-
-MIT
+*Alacient Agentic Core System — Built on GTM-OS*
