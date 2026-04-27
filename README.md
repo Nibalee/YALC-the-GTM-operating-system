@@ -117,6 +117,23 @@ Vault starter: [`templates/obsidian-vault/`](templates/obsidian-vault/)
 
 ---
 
+## Notifications — Slack / Discord
+
+Every agent posts to Slack or Discord at every meaningful event. The team always knows what's happening without opening a dashboard.
+
+| Event | Channel |
+|---|---|
+| Daily pipeline complete (leads found, connects sent) | `#alacient-pipeline` |
+| New qualifying reply received | `#alacient-replies` |
+| Meeting booked | `#alacient-wins` |
+| Reply flagged for human review | `#alacient-review` |
+| Daily intelligence digest | `#alacient-pipeline` |
+| Provider error or pipeline failure | `#alacient-alerts` |
+
+Set up: create an incoming webhook in Slack or Discord, add the URL to `~/.gtm-os/.env` as `SLACK_WEBHOOK_URL` (or `DISCORD_WEBHOOK_URL`), and add it to `config.yaml`. Full setup in [`docs/RENNA-GETTING-STARTED.md`](docs/RENNA-GETTING-STARTED.md).
+
+---
+
 ## Getting Started
 
 **For Renna (system operator):** [`docs/RENNA-GETTING-STARTED.md`](docs/RENNA-GETTING-STARTED.md)

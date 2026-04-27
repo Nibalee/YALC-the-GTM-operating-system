@@ -219,7 +219,48 @@ After this, the vault is live-watched — saves in Obsidian are picked up automa
 
 ---
 
-## Phase 4 — Start the Always-On Server
+## Phase 4 — Set Up Slack (or Discord)
+
+Every agent posts to Slack when something happens — pipeline complete, reply received, meeting booked, review needed. You'll always know what the system is doing without opening a dashboard.
+
+### Option A — Slack
+
+1. Go to `https://api.slack.com/apps` → **Create New App** → **From scratch**
+2. Name it `Alacient Core` → pick your workspace → Create
+3. Left sidebar → **Incoming Webhooks** → toggle **Activate** → **Add New Webhook to Workspace**
+4. Choose the channel (e.g. `#alacient-pipeline`) → Allow → copy the webhook URL
+5. Repeat for `#alacient-replies` and `#alacient-wins` if you want separate channels
+6. Add to `~/.gtm-os/.env`:
+   ```
+   SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+   ```
+
+### Option B — Discord
+
+1. In Discord: open the channel you want → **Settings** → **Integrations** → **Webhooks** → **New Webhook**
+2. Name it `Alacient Core` → copy the webhook URL
+3. Add to `~/.gtm-os/.env`:
+   ```
+   DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR/WEBHOOK/URL
+   ```
+
+### Add Webhook to Tenant Config
+
+Open `~/.gtm-os/tenants/alacient/config.yaml` and add:
+
+```yaml
+slack:
+  webhook_url: "https://hooks.slack.com/services/..."   # or your Discord URL
+  notify_on:
+    - reply
+    - demo_booked
+    - campaign_completed
+    - winner_declared
+```
+
+---
+
+## Phase 5 — Start the Always-On Server
 
 The server handles inbound replies 24/7. It needs to run as a background process that survives machine restarts.
 
@@ -264,7 +305,29 @@ You should see `gtm-os-server` with status `online`.
 
 ---
 
-## Phase 5 — Test Before the First Real Run
+## Phase 6 — Schedule the Daily Agents
+
+This is how the system runs every day without anyone pressing a button.
+
+Open Claude Code and type:
+
+```
+/schedule
+```
+
+**Schedule 1 — Daily Pipeline (09:00 weekdays):**
+- Cron: `0 9 * * 1-5`
+- Prompt: `"Run the Alacient daily lead gen pipeline for tenant alacient: prospect 60 leads matching the ICP in icp-config.yaml, enrich, research each lead's signals, write personalised copy, create campaign and dispatch. Post summary to Slack when done."`
+
+**Schedule 2 — Learning Agent (18:00 weekdays):**
+- Cron: `0 18 * * 1-5`
+- Prompt: `"Run the Alacient learning cycle for tenant alacient: read today's campaign results, extract intelligence patterns, update the intelligence store, write learnings to the Obsidian vault, post daily digest to Slack."`
+
+After setting these up, the pipeline fires every weekday morning automatically. You don't need to do anything.
+
+---
+
+## Phase 7 — Test Before the First Real Run
 
 Run a dry-run that doesn't actually send anything:
 
@@ -294,7 +357,7 @@ If you get back relevant chunks from the vault files you filled in, the context 
 
 ---
 
-## Phase 6 — First Real Pipeline Run
+## Phase 8 — First Real Pipeline Run
 
 When Phases 1–5 are complete, tell me in Claude Code:
 
@@ -310,26 +373,30 @@ I will:
 
 ---
 
-## Phase 7 — Daily Operations (After First Run)
+## Phase 9 — Daily Operations (After First Run)
 
 Once the first run is approved and live:
 
-### What Runs Automatically
+### What Runs Automatically (nothing required from you)
 
-| What | When | Requires you? |
+| What | When | How it runs |
 |---|---|---|
-| Campaign tracker (advances sequences, checks replies) | Every 6 hours | No |
-| Inbound reply routing (intent classifier) | Instant on webhook | No |
-| Auto-responses for OOO, unsubscribes, bounces | Instant | No |
+| Daily lead gen pipeline | 09:00 weekdays | `/schedule` RemoteTrigger → Claude Code |
+| Learning + intel update | 18:00 weekdays | `/schedule` RemoteTrigger → Claude Code |
+| Campaign sequence tracker | Every 6 hours | launchd cron → CLI |
+| Inbound reply routing | Instant on webhook | PM2 server → intent classifier |
+| OOO / unsub / bounce handling | Instant | PM2 server inline |
+| Negotiator (interested replies) | Within 30 sec of reply | PM2 server → RemoteTrigger → Claude Code |
+| Slack/Discord notifications | Every event | Agents + server |
 
-### What Needs You (or Claude Code)
+### What Needs You
 
 | What | When | How |
 |---|---|---|
-| Daily pipeline (new leads) | Every morning | Tell me: "Run today's pipeline for Alacient" |
-| High-value reply review | When flagged | Check `/review` at `http://localhost:3847/review` |
-| Negotiator for interested replies | When reply comes in | Either auto-handled or flagged for your review |
-| Weekly intel review | Weekly | Tell me: "Show me this week's campaign performance for Alacient" |
+| High-value reply approval | When Slack flags it | Open `http://your-server:3847/review` |
+| Updating ICP or signals | When targeting changes | Edit `icp-config.yaml` or Obsidian vault → `context:sync` |
+| Adding case studies / winning copy | After good campaigns | Add note to Obsidian vault → auto-syncs |
+| Weekly strategy check | Weekly | Ask Claude Code: "How is the Alacient pipeline performing this week?" |
 
 ### The Review Dashboard
 
