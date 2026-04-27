@@ -16,38 +16,36 @@ Claude Code is the AI brain. The underlying GTM-OS engine handles all data opera
 ## System Architecture
 
 ```
-09:00 DAILY TRIGGER
-       │
-       ▼
-┌─────────────────────────────────────────────┐
-│         ORCHESTRATOR AGENT                  │
-│  Reads ICP, intel store, pipeline health.   │
-│  Decides today's targeting and delegates.   │
-└──┬──────────┬──────────────────────────┬───┘
-   ▼          ▼                          ▼
-PROSPECTOR  ENRICHER            LEARNING AGENT (18:00)
-   ▼
-INTELLIGENCE COLLECTOR (per lead research)
-   ▼
-COPYWRITER (Obsidian vault → personalised messages)
-   ▼
-OUTREACH DISPATCHER
+┌─────────────────────────────────────────────────────────────────┐
+│                    PAPERCLIP (Orchestration)                     │
+│   Ticket bus · org chart · budgets · approval gates · audit log │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │ tickets
+           ┌───────────────┼───────────────────┐
+           ▼               ▼                   ▼
+   09:00 DAILY        18:00 LEARN         ON DEMAND
+   PIPELINE           CYCLE               NEGOTIATOR
    │
-   ├── LinkedIn connects (Unipile, 30/day)
-   └── Email sequences (Instantly)
+   └── Orchestrator → Prospector → Enricher
+                      → Intelligence Collector
+                      → Copywriter → Dispatcher
+                         │               │
+                    LinkedIn           Email
+                    (Unipile)        (Instantly)
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-ALWAYS-ON (24/7 PM2 server)
+ALWAYS-ON (OpenClaw daemon — Slack, Discord, WhatsApp, Teams)
    │
-   ├── Unipile webhook → intent classifier
-   ├── Instantly webhook → intent classifier
+   ├── Inbound: Unipile + Instantly webhooks → intent classifier
+   │   ├── OOO / Unsub / Bounce → auto-handled (no AI)
+   │   └── Interested / Question → Negotiator ticket (Paperclip)
    │
-   ├── OOO / Unsub / Bounce → auto-handled (no AI)
-   └── Interested / Question → Negotiator Agent (spawned on demand)
+   └── Two-way: "pipeline status?" in Slack → live reply from agents
 ```
 
-Full architecture with Mermaid diagrams: [`docs/AGENTIC-SYSTEM.md`](docs/AGENTIC-SYSTEM.md)
+Full architecture: [`docs/AGENTIC-SYSTEM.md`](docs/AGENTIC-SYSTEM.md)
+OpenClaw + Paperclip integration plan: [`docs/INTEGRATION-PLAN.md`](docs/INTEGRATION-PLAN.md)
 
 ---
 
@@ -221,6 +219,7 @@ Register webhooks:
 | Document | What it covers |
 |---|---|
 | [`docs/AGENTIC-SYSTEM.md`](docs/AGENTIC-SYSTEM.md) | Full architecture with Mermaid diagrams — all agents, data flow, context flow, lead lifecycle |
+| [`docs/INTEGRATION-PLAN.md`](docs/INTEGRATION-PLAN.md) | OpenClaw + Paperclip integration — multi-agent communication, org chart, ticket schemas, 6-phase rollout |
 | [`docs/RENNA-GETTING-STARTED.md`](docs/RENNA-GETTING-STARTED.md) | Step-by-step operator setup guide |
 | [`templates/icp-config.yaml`](templates/icp-config.yaml) | ICP and signal definitions — edit when targeting changes |
 | [`templates/obsidian-vault/README.md`](templates/obsidian-vault/README.md) | Vault structure and setup instructions |

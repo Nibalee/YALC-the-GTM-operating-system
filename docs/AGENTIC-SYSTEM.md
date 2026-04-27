@@ -18,6 +18,7 @@
 10. [Configuration Files](#10-configuration-files)
 11. [Setup Checklist](#11-setup-checklist)
 12. [Adding a New Client](#12-adding-a-new-client)
+13. [Extended Architecture — Paperclip + OpenClaw](#13-extended-architecture--paperclip--openclaw)
 
 ---
 
@@ -659,6 +660,31 @@ FIRST RUN
 [ ] Check Slack for pipeline summary notification
 [ ] Scale to 60 leads/day after first batch reviewed
 ```
+
+---
+
+## 13. Extended Architecture — Paperclip + OpenClaw
+
+The base architecture (Sections 1–12) is fully operational. For production scale, two additional layers unlock true multi-agent independence:
+
+**Paperclip** — orchestration control plane
+- Replaces `/schedule` RemoteTriggers with a persistent ticket bus
+- Every agent handoff (Orchestrator → Prospector → Enricher → ...) becomes an auditable ticket
+- Built-in org chart, per-agent budgets, approval gates, and retry logic
+- Agents run in short bursts when a ticket is assigned — no always-on compute waste
+
+**OpenClaw** — always-on communication daemon
+- Connects to Slack, Discord, WhatsApp, Teams, and 8 other platforms simultaneously
+- Makes notifications two-way: the team can ask "pipeline status?" in Slack and get a live reply
+- Routes inbound messages to the right agent via binding rules (Negotiator, status reporter, command handler)
+- Replaces PM2 + Hono for the always-on communication layer
+
+Together they close the three gaps in the base system:
+1. Claude Code desktop must be open for pipeline to fire → **Paperclip removes this dependency**
+2. Slack notifications are one-way → **OpenClaw makes them two-way**
+3. Agent handoffs have no audit trail → **Paperclip ticket bus logs every step**
+
+Full plan with ticket schemas, org chart, OpenClaw routing YAML, and 6-phase implementation: [`docs/INTEGRATION-PLAN.md`](docs/INTEGRATION-PLAN.md)
 
 ---
 
