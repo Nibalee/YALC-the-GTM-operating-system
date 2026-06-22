@@ -570,6 +570,102 @@ export const leadBlocklist = sqliteTable('lead_blocklist', {
   createdAt: text('created_at').default(sql`(datetime('now'))`),
 })
 
+// ─── Mined People ────────────────────────────────────────────────────────────
+// Source-of-truth "seen set" for lead mining. Exact-key dedup BEFORE spending
+// any enrichment credit: a person (by rr_id / linkedin_url / email) is never
+// looked up or delivered twice for the same tenant. This is what guarantees
+// non-repeating weekly lists. Tenant-scoped.
+export const minedPeople = sqliteTable('mined_people', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  tenantId: text('tenant_id').notNull().default('default'),
+  // Identity / dedup keys — at least one of rrId, linkedinUrl, email, identityKey is set.
+  rrId: integer('rr_id'),                 // RocketReach stable person id — primary dedup key
+  linkedinUrl: text('linkedin_url'),      // normalized (see dedup/engine normalizeLinkedInUrl)
+  email: text('email'),                   // normalized; set after enrichment
+  // Discovery-time identity for job-changers (no rr_id/email yet when scraped
+  // from a trade article): sha1(normalized name + normalized NEW company).
+  identityKey: text('identity_key'),
+  companyDomain: text('company_domain'),  // normalized
+  // Snapshot fields for delivery + reporting
+  name: text('name'),
+  title: text('title'),
+  company: text('company'),
+  location: text('location'),
+  phone: text('phone'),
+  // Lifecycle: seen (found in search) | enriched (looked up) | delivered | no_contact
+  status: text('status').notNull().default('seen'),
+  source: text('source'),                 // e.g. 'rocketreach'
+  queryHash: text('query_hash'),          // which saved query first surfaced this person
+  firstSeenAt: text('first_seen_at').default(sql`(datetime('now'))`),
+  enrichedAt: text('enriched_at'),
+  deliveredAt: text('delivered_at'),
+})
+
+// ─── Search Cursors ──────────────────────────────────────────────────────────
+// The "freshness engine": one pagination bookmark per saved ICP query so each
+// weekly run RESUMES where it left off instead of re-fetching page 1. Without
+// this the ledger would dedup every fetch down to zero new leads. Tenant-scoped.
+export const searchCursors = sqliteTable('search_cursors', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  tenantId: text('tenant_id').notNull().default('default'),
+  queryHash: text('query_hash').notNull(),          // stable hash of the normalized filter
+  queryJson: text('query_json', { mode: 'json' }),  // the filter, for readability/debug
+  label: text('label'),                             // e.g. "VP Eng · fintech · London"
+  nextStart: integer('next_start').notNull().default(1), // offset to resume from next run
+  lastRunAt: text('last_run_at'),
+  lastYield: integer('last_yield').default(0),      // new leads netted last run
+  lowYieldStreak: integer('low_yield_streak').notNull().default(0),
+  totalMatches: integer('total_matches'),           // RR-reported pool size (for TAM/runway)
+  status: text('status', { enum: ['active', 'exhausted'] }).notNull().default('active'),
+  createdAt: text('created_at').default(sql`(datetime('now'))`),
+})
+
+// ─── Mined Companies ─────────────────────────────────────────────────────────
+// Secondary coverage ledger, derived from mined people. Used for Daryl's
+// reporting ("N new companies this week") and OPTIONAL saturation
+// deprioritization — never a hard gate that would blind us to new people at an
+// already-seen company. Tenant-scoped.
+export const minedCompanies = sqliteTable('mined_companies', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  tenantId: text('tenant_id').notNull().default('default'),
+  domain: text('domain').notNull(),       // normalized — dedup key
+  name: text('name'),
+  peopleCount: integer('people_count').notNull().default(0),
+  firstSeenAt: text('first_seen_at').default(sql`(datetime('now'))`),
+  lastMinedAt: text('last_mined_at'),
+})
+
+// ─── Seen URLs ───────────────────────────────────────────────────────────────
+// Discovery-layer dedup for scraping agents: every source URL (article, profile,
+// "Comings & Goings" entry) processed is recorded here so the next run SKIPS
+// re-fetching/re-parsing it. Stops re-scraping the same announcements that stay
+// in the rolling window for weeks. Tenant-scoped.
+export const seenUrls = sqliteTable('seen_urls', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  tenantId: text('tenant_id').notNull().default('default'),
+  urlHash: text('url_hash').notNull(),    // sha1 of the normalized URL — dedup key
+  url: text('url'),                       // original, for debug/reporting
+  sourceLabel: text('source_label'),      // e.g. "Business Insurance - Comings & Goings"
+  firstSeenAt: text('first_seen_at').default(sql`(datetime('now'))`),
+  lastSeenAt: text('last_seen_at').default(sql`(datetime('now'))`),
+  timesSeen: integer('times_seen').notNull().default(1),
+})
+
+// ─── Source Watermarks ───────────────────────────────────────────────────────
+// A chronological cursor per recurring feed. Trade-journal "People on the Move"
+// feeds are newest-first, so a last-processed publish date is a STABLE cursor
+// (unlike RocketReach's relevance offset) — process only entries newer than it.
+// Tenant-scoped.
+export const sourceWatermarks = sqliteTable('source_watermarks', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  tenantId: text('tenant_id').notNull().default('default'),
+  sourceKey: text('source_key').notNull(), // e.g. "business_insurance_comings_goings"
+  label: text('label'),
+  lastPublishedDate: text('last_published_date'), // ISO date of newest processed entry
+  lastRunAt: text('last_run_at'),
+  createdAt: text('created_at').default(sql`(datetime('now'))`),
+})
+
 // ─── Rate Limit Buckets ──────────────────────────────────────────────────────
 // Token bucket rate limiter — DB-backed for persistence across runs
 export const rateLimitBuckets = sqliteTable('rate_limit_buckets', {
